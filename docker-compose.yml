@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  gymondo:
+    build:
+      context: ./
+      dockerfile: ./gymondo.dockerfile
+    ports:
+      - "9000:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    restart: always
+
+  postgres:
+    image: "postgres:14.2"
+    ports:
+      - "5432:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: users
+    restart: always
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
