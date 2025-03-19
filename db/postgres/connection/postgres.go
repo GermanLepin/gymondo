@@ -3,21 +3,21 @@ package connection
 import (
 	"database/sql"
 	"fmt"
+	"github.com/pressly/goose"
 	"log"
 	"os"
 	"time"
 
-	_ "gymondo/db/postgres/changelog"
+	_ "gymondo/db/postgres/migrations"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/pressly/goose"
 )
 
 var driver = "pgx"
 
-func StartDB() *sql.DB {
+func StartDB() (*sql.DB, error) {
 	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s  database=%s sslmode=disable timezone=UTC connect_timeout=5",
+		"host=%s port=%s user=%s password=%s database=%s sslmode=disable timezone=UTC connect_timeout=5",
 		os.Getenv("PG_HOST"),
 		os.Getenv("PG_PORT"),
 		os.Getenv("PG_USER"),
@@ -27,16 +27,19 @@ func StartDB() *sql.DB {
 
 	conn := connectToDB(dsn)
 	if conn == nil {
-		log.Panic("cannot connect to Postgres")
+		return nil, fmt.Errorf("cannot connect to Postgres")
 	}
 
 	if err := goose.Up(conn, "/var"); err != nil {
-		log.Panic("cannot run the migrations")
+		return nil, fmt.Errorf("cannot run the migrations, error is: %s", err)
 	}
 
 	// if smth goes wrong we always can run down Migrations goose.Down()
+	// if err := goose.Down(conn, "/var"); err != nil {
+	//    return nil, fmt.Errorf("cannot run the migrations, error is: %s", err)
+	// }
 
-	return conn
+	return conn, nil
 }
 
 func connectToDB(dsn string) *sql.DB {
