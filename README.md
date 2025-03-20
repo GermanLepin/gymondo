@@ -29,12 +29,22 @@ Accessing the services:
 Alternative Method (from IDE)
 If you prefer to start the service directly from your IDE, you can use the following command:
 
-1. Start the databases with the following command:
+1. Clone the repository:
+    ```
+    git clone git@github.com:GermanLepin/gymondo.git
+    ```
+
+2. Move to the cloned repository and run the command:
+    ```
+    cd gymondo
+    ```
+
+3. Start the databases with the following command:
     ```
     run_postgres
     ```
 
-2. Start the service
+4. Start the service
     ```
     go run cmd/main.go
     ```
