@@ -84,16 +84,5 @@ func upInit(tx *sql.Tx) error {
 }
 
 func downInit(tx *sql.Tx) error {
-	_, err := tx.Exec(`
-		drop table if exists service.users;
-		drop table if exists service.products;
-		drop table if exists service.subscriptions;
-		drop table if exists service.vouchers;
-		drop schema if exists service cascade;
-	`)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
