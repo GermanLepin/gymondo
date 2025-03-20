@@ -6,17 +6,17 @@ import (
 	"net/http"
 )
 
-type Service struct {
-	productService productService
+type Server struct {
+	service service
 }
 
-func New(productService productService) *Service {
-	return &Service{
-		productService: productService,
+func New(service service) *Server {
+	return &Server{
+		service: service,
 	}
 }
 
-func (s *Service) NewRoutes() http.Handler {
+func (s *Server) NewRoutes() http.Handler {
 	router := gin.Default()
 
 	// specify who is allowed to connect
@@ -33,9 +33,12 @@ func (s *Service) NewRoutes() http.Handler {
 		c.Next()
 	})
 
-	router.GET("/api/products/:product_id", s.getProduct)
-	router.GET("/api/products", s.getProducts)
-	//router.POST("/subscriptions", buyProduct)
+	router.GET("/api/products/", s.getProducts)
+	router.GET("/api/products/:voucher_code", s.getProductsWithVoucher)
+	router.GET("/api/product/:product_id", s.getProduct)
+	router.POST("/api/product/subscribe/", s.subscribe)
+	router.GET("/api/subscription/:subscription_id", s.getSubscription)
+	router.POST("/api/subscription/:subscription_id/manage", s.manageSubscription)
 
 	return router
 }

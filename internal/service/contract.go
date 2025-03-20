@@ -7,7 +7,12 @@ import (
 	"gymondo/internal/model"
 )
 
-type productRepository interface {
-	Get(ctx context.Context, productID string) (model.Product, error)
-	GetList(ctx context.Context) ([]model.Product, error)
+type Repository interface {
+	GetProduct(ctx context.Context, productID string) (model.Product, error)
+	GetProducts(ctx context.Context) ([]model.Product, error)
+	GetUser(ctx context.Context, userID string) (model.User, error)
+	SaveSubscription(ctx context.Context, subscription model.Subscription) error
+	GetSubscription(ctx context.Context, subscriptionID string) (model.Subscription, error)
+	UpdateSubscription(ctx context.Context, subscription model.Subscription) error
+	GetVoucherByCode(ctx context.Context, voucherCode string) (model.Voucher, error)
 }

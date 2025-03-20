@@ -1,4 +1,4 @@
-package product
+package repository
 
 import (
 	"context"
@@ -12,48 +12,21 @@ type Repository struct {
 	db *sql.DB
 }
 
-func NewProductRepository(db *sql.DB) *Repository {
+func New(db *sql.DB) *Repository {
 	return &Repository{
 		db: db,
 	}
 }
 
-func (r *Repository) Get(
-	ctx context.Context,
-	productID string,
-) (model.Product, error) {
+func (r *Repository) GetProducts(ctx context.Context) ([]model.Product, error) {
 	const query = `
-		select id, name, price, duration_days
+		select id, name, duration_days, price, tax, total_price
 		from service.products
-		where id = $1
-	`
-
-	var product model.Product
-	err := r.db.QueryRowContext(ctx, query, productID).Scan(
-		&product.ID,
-		&product.Name,
-		&product.Price,
-		&product.DurationDays,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return product, fmt.Errorf("product with ID %s not found", productID)
-		}
-		return product, err
-	}
-
-	return product, nil
-}
-
-func (r *Repository) GetList(ctx context.Context) ([]model.Product, error) {
-	const query = `
-		SELECT id, name, price, duration_days
-		FROM service.products
 	`
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query products: %w", err)
 	}
 	defer rows.Close()
 
@@ -63,17 +36,48 @@ func (r *Repository) GetList(ctx context.Context) ([]model.Product, error) {
 		if err := rows.Scan(
 			&product.ID,
 			&product.Name,
-			&product.Price,
 			&product.DurationDays,
+			&product.Price,
+			&product.Tax,
+			&product.TotalPrice,
 		); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to scan product row: %w", err)
 		}
 		products = append(products, product)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to iterate over products: %w", err)
 	}
 
 	return products, nil
+}
+
+func (r *Repository) GetProduct(
+	ctx context.Context,
+	productID string,
+) (model.Product, error) {
+	const query = `
+		select id, name, duration_days, price, tax, total_price
+		from service.products
+		where id = $1
+	`
+
+	var product model.Product
+	err := r.db.QueryRowContext(ctx, query, productID).Scan(
+		&product.ID,
+		&product.Name,
+		&product.DurationDays,
+		&product.Price,
+		&product.Tax,
+		&product.TotalPrice,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return product, fmt.Errorf("product with ID %s not found: %w", productID, err)
+		}
+		return product, fmt.Errorf("failed to query product by ID %s: %w", productID, err)
+	}
+
+	return product, nil
 }

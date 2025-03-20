@@ -9,43 +9,36 @@ import (
 	"gymondo/internal/service"
 	"log"
 	"net/http"
-	"os"
 )
 
-const webPort = "80"
+const serverPort = "80"
 
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("error loading .env file")
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 }
 
 func main() {
 	conn, err := connection.StartDB()
 	if err != nil {
-		log.Println("couldn't start db")
-		os.Exit(1)
+		log.Fatalf("Could not start DB connection: %v", err)
 	}
+	defer conn.Close()
 
-	productRepository := repository.NewProductRepository(conn)
-	//subscriptionRepository := repository.NewSubscriptionRepository(conn)
-	//voucherRepository := repository.NewVoucherRepository(conn)
+	repo := repository.New(conn)
+	serv := service.New(repo)
 
-	// create services
-	productService := service.New(productRepository)
+	apiRoutes := rest.New(serv)
 
-	// add services to api route
-	apiRoutes := rest.New(productService)
-
-	log.Printf("starting balance service on port %s\n", webPort)
+	log.Printf("Starting balance service on port %s\n", serverPort)
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", webPort),
+		Addr:    fmt.Sprintf(":%s", serverPort),
 		Handler: apiRoutes.NewRoutes(),
 	}
 
-	err = srv.ListenAndServe()
-	if err != nil {
-		log.Panic(err)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatalf("Error starting server: %v", err)
 	}
 }
