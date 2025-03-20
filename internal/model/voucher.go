@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-	
 	"github.com/google/uuid"
 )
 
@@ -13,12 +11,9 @@ const (
 	Fixed      VoucherStatus = "fixed"
 )
 
-// Voucher represents a discount voucher
 type Voucher struct {
 	ID            uuid.UUID     `json:"id"`
 	Code          string        `json:"code"`
 	DiscountType  VoucherStatus `json:"discount_type"`
-	DiscountValue int64         `json:"discount_value"`
-	ValidFrom     time.Time     `json:"valid_from"`
-	ValidUntil    time.Time     `json:"valid_until"`
+	DiscountValue float64       `json:"discount_value"`
 }
