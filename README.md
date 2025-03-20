@@ -11,7 +11,12 @@ To start the service and databases in Docker, follow these steps:
     git clone git@github.com:GermanLepin/gymondo.git
     ```
 
-2. Start the service and database with a single command:
+2. Move to the cloned repository and run the command:
+    ```
+    cd gymondo
+    ```
+
+3. Start the service and database with a single command:
     ```
     make up_build
     ```
