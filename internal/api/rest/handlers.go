@@ -153,7 +153,7 @@ func (s *Server) getSubscription(c *gin.Context) {
 	subscription, err := s.service.FindSubscription(ctx, subscriptionID)
 	if err != nil {
 		log.Printf("Error finding subscription with ID %s: %v", subscriptionID, err)
-		c.JSON(http.StatusBadRequest, ErrorResponse{
+		c.JSON(http.StatusNotFound, ErrorResponse{
 			Error:   "Subscription not found",
 			Details: err.Error(),
 		})

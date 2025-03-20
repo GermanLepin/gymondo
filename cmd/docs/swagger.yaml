@@ -1,0 +1,269 @@
+definitions:
+  model.Product:
+    properties:
+      duration_days:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      tax:
+        type: number
+      total_price:
+        type: number
+    type: object
+  model.Subscription:
+    properties:
+      canceled_date:
+        type: string
+      duration_days:
+        type: integer
+      end_date:
+        type: string
+      id:
+        type: string
+      paused_date:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/model.SubscriptionStatus'
+      tax:
+        type: number
+      total_price:
+        type: number
+      trial_end_date:
+        type: string
+      trial_start_date:
+        type: string
+      unpaused_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.SubscriptionStatus:
+    enum:
+    - active
+    - paused
+    - canceled
+    type: string
+    x-enum-varnames:
+    - Active
+    - Paused
+    - Canceled
+  rest.ErrorResponse:
+    properties:
+      details:
+        type: string
+      error:
+        type: string
+    type: object
+  rest.ManageSubscriptionRequest:
+    properties:
+      action:
+        type: string
+    required:
+    - action
+    type: object
+  rest.ManageSubscriptionResponse:
+    properties:
+      message:
+        type: string
+      subscription_id:
+        type: string
+    type: object
+  rest.SubscriptionRequest:
+    properties:
+      product_id:
+        type: string
+      trial_period:
+        type: boolean
+      user_id:
+        type: string
+      voucher_code:
+        type: string
+    required:
+    - product_id
+    - user_id
+    type: object
+  rest.SubscriptionResponse:
+    properties:
+      message:
+        type: string
+      subscription_id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/product/{product_id}:
+    get:
+      description: Retrieves detailed information about a specific product using the
+        unique product_id. This includes pricing, description, and other attributes.
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Get a specific product
+      tags:
+      - Product
+  /api/v1/product/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: Allows users to subscribe to a product. This endpoint creates a
+        new subscription for a user, including selecting a product and setting the
+        subscription parameters (e.g., trial period, voucher code).
+      parameters:
+      - description: Subscription Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/rest.SubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.SubscriptionResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Subscribe to a product
+      tags:
+      - Product
+  /api/v1/products:
+    get:
+      description: Retrieves a list of all available products. This endpoint provides
+        information about the products that users can subscribe to.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Product'
+            type: array
+        "404":
+          description: Products not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Get all products
+      tags:
+      - Products
+  /api/v1/products/{voucher_code}:
+    get:
+      description: Fetches details of a specific product associated with a given voucher
+        code. The voucher code is used to apply discounts or offers to the product.
+      parameters:
+      - description: Voucher Code
+        in: path
+        name: voucher_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Product'
+            type: array
+        "404":
+          description: Products with voucher not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Get all products with a voucher
+      tags:
+      - Products
+  /api/v1/subscription/{subscription_id}:
+    get:
+      description: Provides details of an active subscription. The subscription_id
+        is used to fetch information about a specific subscription, such as its status,
+        start date, end date, and other relevant information.
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: subscription_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Subscription'
+        "404":
+          description: Subscription not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Get subscription details
+      tags:
+      - Subscription
+  /api/v1/subscription/{subscription_id}/manage:
+    post:
+      consumes:
+      - application/json
+      description: Manages an existing subscription. This endpoint allows users to
+        update or modify their subscription, such as pausing, canceling, or changing
+        other settings related to the subscription.
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: subscription_id
+        required: true
+        type: string
+      - description: Manage Action
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/rest.ManageSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.ManageSubscriptionResponse'
+        "400":
+          description: Invalid action
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Manage subscription
+      tags:
+      - Subscription
+swagger: "2.0"
