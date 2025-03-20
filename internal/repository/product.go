@@ -1,4 +1,4 @@
-package repository
+package product
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"gymondo/internal/model"
 )
 
-type ProductRepository struct {
+type Repository struct {
 	db *sql.DB
 }
 
-func NewProductRepository(db *sql.DB) *ProductRepository {
-	return &ProductRepository{
+func NewProductRepository(db *sql.DB) *Repository {
+	return &Repository{
 		db: db,
 	}
 }
 
-func (pr *ProductRepository) Get(
+func (r *Repository) Get(
 	ctx context.Context,
 	productID string,
 ) (model.Product, error) {
@@ -29,7 +29,7 @@ func (pr *ProductRepository) Get(
 	`
 
 	var product model.Product
-	err := pr.db.QueryRowContext(ctx, query, productID).Scan(
+	err := r.db.QueryRowContext(ctx, query, productID).Scan(
 		&product.ID,
 		&product.Name,
 		&product.Price,
@@ -45,13 +45,13 @@ func (pr *ProductRepository) Get(
 	return product, nil
 }
 
-func (pr *ProductRepository) GetList(ctx context.Context) ([]model.Product, error) {
+func (r *Repository) GetList(ctx context.Context) ([]model.Product, error) {
 	const query = `
 		SELECT id, name, price, duration_days
 		FROM service.products
 	`
 
-	rows, err := pr.db.QueryContext(ctx, query)
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
