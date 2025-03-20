@@ -34,7 +34,7 @@ If you prefer to start the service directly from your IDE, you can use the follo
     go run cmd/main.go
     ```
 
-In this case, the service will be reachable on port 80 (http://localhost:80).
+In this case, the service will be reachable on port 80 http://localhost:80.
 
 Note: When the service is launched, migrations are automatically performed, and the database is populated with initial data.
 
@@ -45,22 +45,18 @@ This rule was not explicitly mentioned in the task. In my current implementation
 # SWAGGER API
 
 The documentation for the service is generated using gin-swagger:
-```
 https://github.com/swaggo/gin-swagger
-```
 
 Before testing the service, please check the following file: `gymondo/db/postgres/migrations/0001_init.go`
 In this file, I have inserted initial data into the main tables (users, products, vouchers). 
 This information will be really helpful for testing the service.
 
 The Swagger service starts automatically, and the documentation is available at:
-```
 http://localhost:9000/swagger/index.html
-```
 
 To regenerate the documentation after making changes, run the following command:
 ```
 swag init -g ./cmd/main.go -o cmd/docs
 ```
 
-I hope you enjoy using the service!!
+I hope you enjoy using the service!
