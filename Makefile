@@ -26,11 +26,3 @@ build_gymondo:
 	@echo "building Gymondo binary..."
 	env GOOS=linux CGO_ENABLED=0 go build -o ${GYMONDO_BINARY} ./cmd
 	@echo "build completed"
-
-## running integration tests
-test.integration:
-	go test -tags=integration ./integration_tests -v 
-
-## running UNIT tests
-test.unit:
-	go test ./...

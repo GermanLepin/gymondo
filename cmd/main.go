@@ -9,6 +9,8 @@ import (
 	"gymondo/internal/service"
 	"log"
 	"net/http"
+
+	_ "gymondo/cmd/docs"
 )
 
 const serverPort = "80"
@@ -31,7 +33,6 @@ func main() {
 	serv := service.New(repo)
 
 	apiRoutes := rest.New(serv)
-
 	log.Printf("Starting balance service on port %s\n", serverPort)
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", serverPort),

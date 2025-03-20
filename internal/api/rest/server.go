@@ -3,6 +3,8 @@ package rest
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 )
 
@@ -33,12 +35,14 @@ func (s *Server) NewRoutes() http.Handler {
 		c.Next()
 	})
 
-	router.GET("/api/products/", s.getProducts)
-	router.GET("/api/products/:voucher_code", s.getProductsWithVoucher)
-	router.GET("/api/product/:product_id", s.getProduct)
-	router.POST("/api/product/subscribe/", s.subscribe)
-	router.GET("/api/subscription/:subscription_id", s.getSubscription)
-	router.POST("/api/subscription/:subscription_id/manage", s.manageSubscription)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	router.GET("/api/v1/products/", s.getProducts)
+	router.GET("/api/v1/products/:voucher_code", s.getProductsWithVoucher)
+	router.GET("/api/v1/product/:product_id", s.getProduct)
+	router.POST("/api/v1/product/subscribe/", s.subscribe)
+	router.GET("/api/v1/subscription/:subscription_id", s.getSubscription)
+	router.POST("/api/v1/subscription/:subscription_id/manage", s.manageSubscription)
 
 	return router
 }

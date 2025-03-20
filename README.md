@@ -42,33 +42,25 @@ Open question: Should a user be allowed to have only one active (non-cancelled) 
 This rule was not explicitly mentioned in the task. In my current implementation, it is possible for a user to have multiple active subscriptions. However, I am open to modifying this if needed.
 
 
-# API
+# SWAGGER API
 
-The list of all active handles:
-1. `/api/products/"`
-   
-   Retrieves a list of all available products. This endpoint provides information about the products that users can subscribe to.
+The documentation for the service is generated using gin-swagger:
+```
+https://github.com/swaggo/gin-swagger
+```
 
+Before testing the service, please check the following file: `gymondo/db/postgres/migrations/0001_init.go`
+In this file, I have inserted initial data into the main tables (users, products, vouchers). 
+This information will be really helpful for testing the service.
 
-2. `/api/products/:voucher_code`
+The Swagger service starts automatically, and the documentation is available at:
+```
+http://localhost:9000/swagger/index.html
+```
 
-   Fetches details of a specific product associated with a given voucher code. The voucher code is used to apply discounts or offers to the product.
+To regenerate the documentation after making changes, run the following command:
+```
+swag init -g ./cmd/main.go -o cmd/docs
+```
 
-
-3. `/api/product/:product_id`
-
-   Retrieves detailed information about a specific product using the unique product_id. This includes pricing, description, and other attributes.
-
-
-4. `/api/product/subscribe/`
-
-   Allows users to subscribe to a product. This endpoint creates a new subscription for a user, including selecting a product and setting the subscription parameters (e.g., trial period, voucher code).
-
-
-5. `/api/subscription/:subscription_id`
-   Provides details of an active subscription. The subscription_id is used to fetch information about a specific subscription, such as its status, start date, end date, and other relevant information.
-
-
-6. `/api/subscription/:subscription_id/manage`
-   Manages an existing subscription. This endpoint allows users to update or modify their subscription, such as pausing, canceling, or changing other settings related to the subscription.
-
+I hope you enjoy using the service!!
